@@ -11,30 +11,34 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
+import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 
 /**
  * Created by Daksh on 1/4/16.
  */
 public class BlocActivity extends AppCompatActivity {
 
-    private ItemAdapter           itemAdapter;
-    private ActionBarDrawerToggle drawerToggle;
-    private DrawerLayout          drawerLayout;
+    private ItemAdapter             itemAdapter;
+    private ActionBarDrawerToggle   drawerToggle;
+    private DrawerLayout            drawerLayout;
+    private NavigationDrawerAdapter navigationDrawerAdapter;
 
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
+
         Toast.makeText(this, BloclyApplication.getSharedDataSource().getFeeds().get(0).getTitle(),
                        Toast.LENGTH_LONG).show();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.tb_activity_blocly);
+        Toolbar toolbar = ( Toolbar ) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
 
         itemAdapter = new ItemAdapter();
@@ -51,6 +55,12 @@ public class BlocActivity extends AppCompatActivity {
         // #6
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0);
         drawerLayout.setDrawerListener(drawerToggle);
+
+        navigationDrawerAdapter = new NavigationDrawerAdapter();
+        RecyclerView navigationRecyclerView = (RecyclerView) findViewById(R.id.rv_nav_activity_blocly);
+        navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        navigationRecyclerView.setAdapter(navigationDrawerAdapter);
     }
 
     // #7a
