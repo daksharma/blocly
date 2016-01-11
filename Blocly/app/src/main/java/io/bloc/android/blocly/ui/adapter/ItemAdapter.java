@@ -134,10 +134,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         @Override
         public void onLoadingComplete (String imageUri, View view, Bitmap loadedImage) {
             // #10
-            if ( imageUri.equals(rssItem.getImageUrl()) ) {
+            //if ( imageUri.equals(rssItem.getImageUrl()) ) {
                 headerImage.setImageBitmap(loadedImage);
                 headerImage.setVisibility(View.VISIBLE);
-            }
+            //}
+
         }
 
         @Override
@@ -151,7 +152,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             if (view == itemView) {
                 animateContent(!contentExpanded);
             } else {
-                Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
             }
         }
 
