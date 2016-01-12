@@ -7,4 +7,10 @@
     <string name="navigation_option_inbox">Inbox</string>
     <string name="navigation_option_archived">Archived</string>
     <string name="navigation_option_favorites">Favorites</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_mark_as_read">Mark All As Read</string>
+    <string name="menu_refresh">Refresh</string>
+
+
 </resources>

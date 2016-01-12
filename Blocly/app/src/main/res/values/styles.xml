@@ -14,8 +14,18 @@
         <item name="android:windowBackground">@color/windowBackground</item>
         <!-- DrawerArrowStyle -->
         <item name="drawerArrowStyle">@style/DrawerArrow</item>
+
+        <!-- OverFlow Menu Button -->
+        <item name="android:actionOverflowButtonStyle">@style/OverflowButton</item>
     </style>
 
+    <!-- OverFlow Menu Button -->
+    <style name="OverflowButton" parent="android:Widget.Holo.ActionButton.Overflow">
+        <item name="android:src">@drawable/ic_overflow_menu_selector</item>
+        <item name="android:paddingLeft">@dimen/default_padding</item>
+    </style>
+
+    <!-- HeadLine Text Style -->
     <style name="Headline">
         <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">24sp</item>
@@ -23,6 +33,7 @@
         <item name="robotoFont">Regular</item>
     </style>
 
+    <!-- Caption Text Style  -->
     <style name="Caption">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">12sp</item>
@@ -31,13 +42,16 @@
         <item name="robotoFont">Regular</item>
     </style>
 
+    <!-- Body Text Style  -->
     <style name="Body1">
         <item name="android:textColor">@color/text_secondary</item>
         <item name="android:textSize">14sp</item>
         <item name="robotoFont">Regular</item>
-        <item name="Condensed">true</item> <!-- still not working -->
+        <item name="Condensed">true</item>
+        <!-- still not working -->
     </style>
 
+    <!-- Button Text Style  -->
     <style name="Button">
         <item name="android:textColor">@drawable/btn_text_drawable</item>
         <item name="android:textSize">14sp</item>
