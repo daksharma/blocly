@@ -68,8 +68,6 @@ public class RobotoTextView extends TextView {
         }
 
         setTypeface(robotoTypeface);
-
-        //typedArray.recycle();
     }
 
 }

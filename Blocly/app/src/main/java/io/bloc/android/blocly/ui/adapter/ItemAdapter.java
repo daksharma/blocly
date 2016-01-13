@@ -19,6 +19,8 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 
+import java.lang.ref.WeakReference;
+
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
 import io.bloc.android.blocly.api.DataSource;
@@ -30,7 +32,22 @@ import io.bloc.android.blocly.api.model.RssItem;
  */
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterViewHolder> {
 
+    public static interface DataSource {
+        public RssItem getRssItem (ItemAdapter itemAdapter, int position);
+        public RssFeed getRssFeed (ItemAdapter itemAdapter, int position);
+        public int getItemCount (ItemAdapter itemAdapter);
+    }
+
+    public static interface Delegate {
+        public void onItemClicked (ItemAdapter itemAdapter, RssItem rssItem);
+    }
+
     private static String TAG = ItemAdapter.class.getSimpleName();
+
+    private RssItem expandedItem = null;
+    private WeakReference<Delegate>   delegate;
+    private WeakReference<DataSource> dataSource;
+
 
     @Override
     public ItemAdapterViewHolder onCreateViewHolder (ViewGroup viewGroup, int index) {
@@ -42,17 +59,51 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
     @Override
     public void onBindViewHolder (ItemAdapterViewHolder itemAdapterViewHolder, int index) {
-        DataSource sharedDataSource = BloclyApplication.getSharedDataSource();
-        itemAdapterViewHolder.update(sharedDataSource.getFeeds().get(0),
-                                     sharedDataSource.getItems().get(index));
+        if ( getDataSource() == null ) {
+            return;
+        }
+        RssItem rssItem = getDataSource().getRssItem(this, index);
+        RssFeed rssFeed = getDataSource().getRssFeed(this, index);
+        itemAdapterViewHolder.update(rssFeed, rssItem);
     }
 
 
     @Override
     public int getItemCount () {
-        return BloclyApplication.getSharedDataSource()
-                                .getItems()
-                                .size();
+        if ( getDataSource() == null ) {
+            return 0;
+        }
+        return getDataSource().getItemCount(this);
+    }
+
+    public DataSource getDataSource () {
+        if ( dataSource == null ) {
+            return null;
+        }
+        return dataSource.get();
+    }
+
+    public void setDataSource (DataSource dataSource) {
+        this.dataSource = new WeakReference<DataSource>(dataSource);
+    }
+
+    public Delegate getDelegate () {
+        if ( delegate == null ) {
+            return null;
+        }
+        return delegate.get();
+    }
+
+    public void setDelegate (Delegate delegate) {
+        this.delegate = new WeakReference<Delegate>(delegate);
+    }
+
+    public RssItem getExpandedItem () {
+        return expandedItem;
+    }
+
+    public void setExpandedItem (RssItem expandedItem) {
+        this.expandedItem = expandedItem;
     }
 
 
@@ -71,10 +122,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         CheckBox archiveCheckBox;
         CheckBox favoriteCheckBox;
 
-        boolean contentExpanded;
-        View expandedContentWrapper;
+        boolean  contentExpanded;
+        View     expandedContentWrapper;
         TextView expandedContent;
-        Button visitSiteBtn;
+        Button   visitSiteBtn;
 
 
         public ItemAdapterViewHolder (View itemView) {
@@ -88,11 +139,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             headerImage = ( ImageView ) headerWrapper.findViewById(R.id.iv_rss_item_image);
 
             archiveCheckBox = ( CheckBox ) itemView.findViewById(R.id.cb_rss_item_check_mark);
-            favoriteCheckBox = (CheckBox)itemView.findViewById(R.id.cb_rss_item_favorite_star);
+            favoriteCheckBox = ( CheckBox ) itemView.findViewById(R.id.cb_rss_item_favorite_star);
 
             expandedContentWrapper = itemView.findViewById(R.id.ll_rss_item_expanded_content_wrapper);
-            expandedContent = (TextView) expandedContentWrapper.findViewById(R.id.tv_rss_item_content_full);
-            visitSiteBtn = (Button) expandedContentWrapper.findViewById(R.id.visit_site_btn);
+            expandedContent = ( TextView ) expandedContentWrapper.findViewById(R.id.tv_rss_item_content_full);
+            visitSiteBtn = ( Button ) expandedContentWrapper.findViewById(R.id.visit_site_btn);
 
             itemView.setOnClickListener(this);
             archiveCheckBox.setOnCheckedChangeListener(this);
@@ -116,6 +167,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             } else {
                 headerWrapper.setVisibility(View.GONE);
             }
+            animateContent(getExpandedItem() == rssItem);
         }
 
         /*
@@ -133,10 +185,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         @Override
         public void onLoadingComplete (String imageUri, View view, Bitmap loadedImage) {
-            // #10
             //if ( imageUri.equals(rssItem.getImageUrl()) ) {
-                headerImage.setImageBitmap(loadedImage);
-                headerImage.setVisibility(View.VISIBLE);
+            headerImage.setImageBitmap(loadedImage);
+            headerImage.setVisibility(View.VISIBLE);
             //}
 
         }
@@ -149,8 +200,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
         @Override
         public void onClick (View view) {
-            if (view == itemView) {
-                animateContent(!contentExpanded);
+            if ( view == itemView ) {
+                if ( getDelegate() != null ) {
+                    getDelegate().onItemClicked(ItemAdapter.this, rssItem);
+                }
             } else {
                 //Toast.makeText(view.getContext(), "Visit " + rssItem.getUrl(), Toast.LENGTH_SHORT).show();
             }
@@ -159,7 +212,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
         @Override
         public void onCheckedChanged (CompoundButton compoundButton, boolean isChecked) {
             Log.v(TAG, "Checked changed to: " + isChecked);
-            if (compoundButton.getId() == archiveCheckBox.getId()) {
+            if ( compoundButton.getId() == archiveCheckBox.getId() ) {
                 Log.v(TAG, "Checkbox: Archive was Clicked");
             } else {
                 Log.v(TAG, "Checkbox: Favorite was Clicked");
@@ -170,46 +223,35 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
           * Private Methods
           */
 
-        private void animateContent(final boolean expand) {
-            // #1
-            if ((expand && contentExpanded) || (!expand && !contentExpanded)) {
-                return;
-            }
-            // #2
+        private void animateContent (final boolean expand) {
+
             int startingHeight = expandedContentWrapper.getMeasuredHeight();
-            int finalHeight = content.getMeasuredHeight();
-            if (expand) {
-                // #3
+            int finalHeight    = content.getMeasuredHeight();
+            if ( expand ) {
                 startingHeight = finalHeight;
                 expandedContentWrapper.setAlpha(0f);
                 expandedContentWrapper.setVisibility(View.VISIBLE);
-                // #4
-                expandedContentWrapper.measure(
-                        View.MeasureSpec.makeMeasureSpec(content.getWidth(), View.MeasureSpec.EXACTLY),
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                                              );
+                expandedContentWrapper.measure(View.MeasureSpec.makeMeasureSpec(content.getWidth(), View.MeasureSpec.EXACTLY),
+                                               ViewGroup.LayoutParams.WRAP_CONTENT);
                 finalHeight = expandedContentWrapper.getMeasuredHeight();
             } else {
                 content.setVisibility(View.VISIBLE);
             }
             startAnimator(startingHeight, finalHeight, new ValueAnimator.AnimatorUpdateListener() {
                 @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    // #5
+                public void onAnimationUpdate (ValueAnimator valueAnimator) {
                     float animatedFraction = valueAnimator.getAnimatedFraction();
-                    float wrapperAlpha = expand ? animatedFraction : 1f - animatedFraction;
-                    float contentAlpha = 1f - wrapperAlpha;
+                    float wrapperAlpha     = expand ? animatedFraction : 1f - animatedFraction;
+                    float contentAlpha     = 1f - wrapperAlpha;
 
                     expandedContentWrapper.setAlpha(wrapperAlpha);
                     content.setAlpha(contentAlpha);
-                    // #6
                     expandedContentWrapper.getLayoutParams().height = animatedFraction == 1f ?
-                            ViewGroup.LayoutParams.WRAP_CONTENT :
-                            (Integer) valueAnimator.getAnimatedValue();
-                    // #7
+                                                                      ViewGroup.LayoutParams.WRAP_CONTENT :
+                                                                      ( Integer ) valueAnimator.getAnimatedValue();
                     expandedContentWrapper.requestLayout();
-                    if (animatedFraction == 1f) {
-                        if (expand) {
+                    if ( animatedFraction == 1f ) {
+                        if ( expand ) {
                             content.setVisibility(View.GONE);
                         } else {
                             expandedContentWrapper.setVisibility(View.GONE);
@@ -220,12 +262,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
             contentExpanded = expand;
         }
 
-        private void startAnimator(int start, int end, ValueAnimator.AnimatorUpdateListener animatorUpdateListener) {
+        private void startAnimator (int start, int end, ValueAnimator.AnimatorUpdateListener animatorUpdateListener) {
             ValueAnimator valueAnimator = ValueAnimator.ofInt(start, end);
             valueAnimator.addUpdateListener(animatorUpdateListener);
-            // #8
             valueAnimator.setDuration(itemView.getResources().getInteger(android.R.integer.config_mediumAnimTime));
-            // #9
             valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
             valueAnimator.start();
         }
