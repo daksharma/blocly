@@ -13,4 +13,8 @@
     <string name="menu_refresh">Refresh</string>
 
 
+    <!-- Share String -->
+    <string name="share_chooser_title">Share with...</string>
+
+
 </resources>
