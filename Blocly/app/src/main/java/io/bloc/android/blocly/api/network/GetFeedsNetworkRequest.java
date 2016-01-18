@@ -22,16 +22,15 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
 
     public static final int ERROR_PARSING = 3;
 
-    private static final String XML_TAG_TITLE = "title";
+    private static final String XML_TAG_TITLE       = "title";
     private static final String XML_TAG_DESCRIPTION = "description";
-    private static final String XML_TAG_LINK = "link";
-    private static final String XML_TAG_ITEM = "item";
-    private static final String XML_TAG_PUB_DATE = "pubDate";
-    private static final String XML_TAG_GUID = "guid";
-    private static final String XML_TAG_ENCLOSURE = "enclosure";
-    private static final String XML_ATTRIBUTE_URL = "url";
-    private static final String XML_ATTRIBUTE_TYPE = "type";
-
+    private static final String XML_TAG_LINK        = "link";
+    private static final String XML_TAG_ITEM        = "item";
+    private static final String XML_TAG_PUB_DATE    = "pubDate";
+    private static final String XML_TAG_GUID        = "guid";
+    private static final String XML_TAG_ENCLOSURE   = "enclosure";
+    private static final String XML_ATTRIBUTE_URL   = "url";
+    private static final String XML_ATTRIBUTE_TYPE  = "type";
 
 
     String[] feedUrls;
@@ -56,7 +55,7 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
 
                 NodeList allItemNodes = xmlDocument.getElementsByTagName(XML_TAG_ITEM);
                 List<ItemResponse> responseItems = new ArrayList<ItemResponse>(allItemNodes.getLength());
-                for (int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++) {
+                for ( int itemIndex = 0; itemIndex < allItemNodes.getLength(); itemIndex++ ) {
                     String itemURL = null;
                     String itemTitle = null;
                     String itemDescription = null;
@@ -67,24 +66,25 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
 
                     Node itemNode = allItemNodes.item(itemIndex);
                     NodeList tagNodes = itemNode.getChildNodes();
-                    for (int tagIndex = 0; tagIndex < tagNodes.getLength(); tagIndex++) {
+                    for ( int tagIndex = 0; tagIndex < tagNodes.getLength(); tagIndex++ ) {
                         Node tagNode = tagNodes.item(tagIndex);
                         String tag = tagNode.getNodeName();
                         // #9
-                        if (XML_TAG_LINK.equalsIgnoreCase(tag)) {
+                        if ( XML_TAG_LINK.equalsIgnoreCase(tag) ) {
                             itemURL = tagNode.getTextContent();
-                        } else if (XML_TAG_TITLE.equalsIgnoreCase(tag)) {
+                        } else if ( XML_TAG_TITLE.equalsIgnoreCase(tag) ) {
                             itemTitle = tagNode.getTextContent();
-                        } else if (XML_TAG_DESCRIPTION.equalsIgnoreCase(tag)) {
+                        } else if ( XML_TAG_DESCRIPTION.equalsIgnoreCase(tag) ) {
                             itemDescription = tagNode.getTextContent();
-                        } else if (XML_TAG_ENCLOSURE.equalsIgnoreCase(tag)) {
+                        } else if ( XML_TAG_ENCLOSURE.equalsIgnoreCase(tag) ) {
                             // #10
                             NamedNodeMap enclosureAttributes = tagNode.getAttributes();
                             itemEnclosureURL = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_URL).getTextContent();
-                            itemEnclosureMIMEType = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();
-                        } else if (XML_TAG_PUB_DATE.equalsIgnoreCase(tag)) {
+                            itemEnclosureMIMEType = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_TYPE)
+                                                                       .getTextContent();
+                        } else if ( XML_TAG_PUB_DATE.equalsIgnoreCase(tag) ) {
                             itemPubDate = tagNode.getTextContent();
-                        } else if (XML_TAG_GUID.equalsIgnoreCase(tag)) {
+                        } else if ( XML_TAG_GUID.equalsIgnoreCase(tag) ) {
                             itemGUID = tagNode.getTextContent();
                         }
                     }
@@ -100,15 +100,15 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                 }
                 responseFeeds.add(new FeedResponse(feedUrlString, channelTitle, channelURL, channelDescription, responseItems));
                 inputStream.close();
-            } catch (IOException e) {
+            } catch ( IOException e ) {
                 e.printStackTrace();
                 setErrorCode(ERROR_IO);
                 return null;
-            } catch (SAXException e) {
+            } catch ( SAXException e ) {
                 e.printStackTrace();
                 setErrorCode(ERROR_PARSING);
                 return null;
-            } catch (ParserConfigurationException e) {
+            } catch ( ParserConfigurationException e ) {
                 e.printStackTrace();
                 setErrorCode(ERROR_PARSING);
                 return null;
@@ -117,9 +117,9 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
         return responseFeeds;
     }
 
-    private String optFirstTagFromDocument(Document document, String tagName) {
+    private String optFirstTagFromDocument (Document document, String tagName) {
         NodeList elementsByTagName = document.getElementsByTagName(tagName);
-        if (elementsByTagName.getLength() > 0) {
+        if ( elementsByTagName.getLength() > 0 ) {
             return elementsByTagName.item(0).getTextContent();
         }
         return null;

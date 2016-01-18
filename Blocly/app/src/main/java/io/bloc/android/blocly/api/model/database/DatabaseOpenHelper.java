@@ -22,15 +22,15 @@ public class DatabaseOpenHelper extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
-        for (Table table : tables) {
+    public void onCreate (SQLiteDatabase db) {
+        for ( Table table : tables ) {
             db.execSQL(table.getCreateStatement());
         }
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        for (Table table : tables) {
+    public void onUpgrade (SQLiteDatabase db, int oldVersion, int newVersion) {
+        for ( Table table : tables ) {
             table.onUpgrade(db, oldVersion, newVersion);
         }
     }

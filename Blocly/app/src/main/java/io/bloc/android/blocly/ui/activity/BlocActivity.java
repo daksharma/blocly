@@ -1,7 +1,10 @@
 package io.bloc.android.blocly.ui.activity;
 
 import android.animation.ValueAnimator;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 
 import io.bloc.android.blocly.BloclyApplication;
 import io.bloc.android.blocly.R;
+import io.bloc.android.blocly.api.DataSource;
 import io.bloc.android.blocly.api.model.RssFeed;
 import io.bloc.android.blocly.api.model.RssItem;
 import io.bloc.android.blocly.ui.adapter.ItemAdapter;
@@ -35,7 +39,7 @@ import io.bloc.android.blocly.ui.adapter.NavigationDrawerAdapter;
 public class BlocActivity extends AppCompatActivity implements NavigationDrawerAdapter.NavigationDrawerAdapterDelegate,
                                                                ItemAdapter.DataSource,
                                                                ItemAdapter.Delegate {
-    private RecyclerView recyclerView;
+    private RecyclerView            recyclerView;
     private ItemAdapter             itemAdapter;
     private ActionBarDrawerToggle   drawerToggle;
     private DrawerLayout            drawerLayout;
@@ -43,14 +47,21 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
     private Menu                    menu;
     private View                    overflowButton;
 
+    private BroadcastReceiver dataSourceBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive (Context context, Intent intent) {
+            itemAdapter.notifyDataSetChanged();
+            navigationDrawerAdapter.notifyDataSetChanged();
+        }
+    };
+
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_blocly);
 
-        Toast.makeText(this, BloclyApplication.getSharedDataSource().getFeeds().get(0).getTitle(),
-                       Toast.LENGTH_LONG).show();
+//        Toast.makeText(this, BloclyApplication.getSharedDataSource().getFeeds().get(0).getTitle(),Toast.LENGTH_LONG).show();
 
         Toolbar toolbar = ( Toolbar ) findViewById(R.id.tb_activity_blocly);
         setSupportActionBar(toolbar);
@@ -59,7 +70,7 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
         itemAdapter.setDataSource(this);
         itemAdapter.setDelegate(this);
 
-        recyclerView = (RecyclerView) findViewById(R.id.rv_activity_blocly);
+        recyclerView = ( RecyclerView ) findViewById(R.id.rv_activity_blocly);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(itemAdapter);
@@ -82,7 +93,7 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
 
                 for ( int i = 0; i < menu.size(); i++ ) {
                     MenuItem item = menu.getItem(i);
-                    if (item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null) {
+                    if ( item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null ) {
                         continue;
                     }
                     item.setEnabled(true);
@@ -132,7 +143,7 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
 
                 for ( int i = 0; i < menu.size(); i++ ) {
                     MenuItem item = menu.getItem(i);
-                    if (item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null) {
+                    if ( item.getItemId() == R.id.action_share && itemAdapter.getExpandedItem() == null ) {
                         continue;
                     }
                     Drawable icon = item.getIcon();
@@ -152,6 +163,8 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
         navigationRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         navigationRecyclerView.setItemAnimator(new DefaultItemAnimator());
         navigationRecyclerView.setAdapter(navigationDrawerAdapter);
+
+        registerReceiver(dataSourceBroadcastReceiver, new IntentFilter(DataSource.ACTION_DOWNLOAD_COMPLETED));
     }
 
     @Override
@@ -180,9 +193,9 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
         } else {
             Toast.makeText(this, "Mark 'em all!", Toast.LENGTH_SHORT).show();
         }
-        if (item.getItemId() == R.id.action_share) {
+        if ( item.getItemId() == R.id.action_share ) {
             RssItem itemToShare = itemAdapter.getExpandedItem();
-            if (itemToShare == null) {
+            if ( itemToShare == null ) {
                 return false;
             }
             // #4
@@ -208,6 +221,12 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
         this.menu = menu;
         animateShareItem(itemAdapter.getExpandedItem() != null);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onDestroy () {
+        super.onDestroy();
+        unregisterReceiver(dataSourceBroadcastReceiver);
     }
 
     /*
@@ -260,7 +279,7 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
                                                   .getItems()
                                                   .indexOf(itemAdapter.getExpandedItem());
             View viewToContract = recyclerView.getLayoutManager().findViewByPosition(positionToContract);
-            if (viewToContract == null) {
+            if ( viewToContract == null ) {
                 positionToContract = -1;
             }
         }
@@ -287,7 +306,7 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
         }
 
         int lessToScroll = 0;
-        if (positionToContract > -1 && positionToContract < positionToExpand) {
+        if ( positionToContract > -1 && positionToContract < positionToExpand ) {
             lessToScroll = itemAdapter.getExpandedItemHeight() - itemAdapter.getCollapsedItemHeight();
         }
         View viewToExpand = recyclerView.getLayoutManager().findViewByPosition(positionToExpand);
@@ -297,7 +316,7 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
 
 
     @Override
-    public void onVisitClicked(ItemAdapter itemAdapter, RssItem rssItem) {
+    public void onVisitClicked (ItemAdapter itemAdapter, RssItem rssItem) {
         // #9
         Intent visitIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssItem.getUrl()));
         startActivity(visitIntent);
@@ -308,20 +327,20 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
       * Private methods
       */
 
-    private void animateShareItem(final boolean enabled) {
+    private void animateShareItem (final boolean enabled) {
         MenuItem shareItem = menu.findItem(R.id.action_share);
-        if (shareItem.isEnabled() == enabled) {
+        if ( shareItem.isEnabled() == enabled ) {
             return;
         }
         shareItem.setEnabled(enabled);
-        final Drawable shareIcon = shareItem.getIcon();
-        ValueAnimator valueAnimator = ValueAnimator.ofInt(enabled ? new int[]{0, 255} : new int[]{255, 0});
+        final Drawable shareIcon     = shareItem.getIcon();
+        ValueAnimator  valueAnimator = ValueAnimator.ofInt(enabled ? new int[]{0, 255} : new int[]{255, 0});
         valueAnimator.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
         valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
         valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                shareIcon.setAlpha((Integer) animation.getAnimatedValue());
+            public void onAnimationUpdate (ValueAnimator animation) {
+                shareIcon.setAlpha(( Integer ) animation.getAnimatedValue());
             }
         });
         valueAnimator.start();

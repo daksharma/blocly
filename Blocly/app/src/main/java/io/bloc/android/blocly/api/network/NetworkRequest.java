@@ -10,28 +10,29 @@ import java.net.URL;
  */
 public abstract class NetworkRequest<Result> {
 
-    public static final int ERROR_IO = 1;
+    public static final int ERROR_IO            = 1;
     public static final int ERROR_MALFORMED_URL = 2;
 
     private int errorCode;
 
-    protected void setErrorCode(int errorCode) {
+    protected void setErrorCode (int errorCode) {
         this.errorCode = errorCode;
     }
 
-    public int getErrorCode() {
+    public int getErrorCode () {
         return errorCode;
     }
 
-    public abstract Result performRequest();
+    public abstract Result performRequest ();
 
-    protected InputStream openStream(String urlString) {
+    protected InputStream openStream (String urlString) {
         URL url = null;
 
         try {
             url = new URL(urlString);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();;
+        } catch ( MalformedURLException e ) {
+            e.printStackTrace();
+            ;
             setErrorCode(ERROR_MALFORMED_URL);
             return null;
         }
