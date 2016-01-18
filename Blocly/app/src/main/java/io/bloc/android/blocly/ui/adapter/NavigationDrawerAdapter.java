@@ -34,7 +34,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed);
     }
 
-    // #1
     WeakReference<NavigationDrawerAdapterDelegate> delegate;
     WeakReference<NavigationDrawerAdapterDataSource> dataSource;
 
@@ -149,11 +148,9 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
                 return;
             }
             if (position < NavigationOption.values().length) {
-                // #2a
                 getDelegate().didSelectNavigationOption(NavigationDrawerAdapter.this,
                                                         NavigationOption.values()[position]);
             } else {
-                // #2b
                 getDelegate().didSelectFeed(NavigationDrawerAdapter.this, rssFeed);
             }
         }

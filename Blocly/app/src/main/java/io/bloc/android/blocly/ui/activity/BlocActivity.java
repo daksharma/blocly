@@ -75,7 +75,8 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh () {
-                BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+                //BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.feedburner.com/androidcentral?format=xml",
+                BloclyApplication.getSharedDataSource().fetchNewFeed("http://feeds.ign.com/ign/all?format=xml",
                                   new DataSource.Callback<RssFeed>() {
                                       @Override
                                       public void onSuccess (RssFeed rssFeed) {
@@ -239,16 +240,10 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
             if ( itemToShare == null ) {
                 return false;
             }
-            // #4
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            // #5
-            shareIntent.putExtra(Intent.EXTRA_TEXT,
-                                 String.format("%s (%s)", itemToShare.getTitle(), itemToShare.getUrl()));
-            // #6
+            shareIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s (%s)", itemToShare.getTitle(), itemToShare.getUrl()));
             shareIntent.setType("text/plain");
-            // #7
             Intent chooser = Intent.createChooser(shareIntent, getString(R.string.share_chooser_title));
-            // #8
             startActivity(chooser);
         } else {
             Toast.makeText(this, item.getTitle(), Toast.LENGTH_SHORT).show();
@@ -365,7 +360,6 @@ public class BlocActivity extends AppCompatActivity implements NavigationDrawerA
 
     @Override
     public void onVisitClicked (ItemAdapter itemAdapter, RssItem rssItem) {
-        // #9
         Intent visitIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(rssItem.getUrl()));
         startActivity(visitIntent);
     }
