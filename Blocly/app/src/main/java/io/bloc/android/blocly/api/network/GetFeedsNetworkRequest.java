@@ -89,7 +89,8 @@ public class GetFeedsNetworkRequest extends NetworkRequest<List<GetFeedsNetworkR
                         } else if ( XML_TAG_ENCLOSURE.equalsIgnoreCase(tag) ) {
                             NamedNodeMap enclosureAttributes = tagNode.getAttributes();
                             itemEnclosureURL = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_URL).getTextContent();
-                            itemEnclosureMIMEType = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_TYPE).getTextContent();
+                            itemEnclosureMIMEType = enclosureAttributes.getNamedItem(XML_ATTRIBUTE_TYPE)
+                                                                       .getTextContent();
                         } else if ( XML_TAG_PUB_DATE.equalsIgnoreCase(tag) ) {
                             itemPubDate = tagNode.getTextContent();
                         } else if ( XML_TAG_GUID.equalsIgnoreCase(tag) ) {

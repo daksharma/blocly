@@ -36,7 +36,7 @@ public abstract class Table {
                                       null);
     }
 
-    public static long getRowId(Cursor cursor) {
+    public static long getRowId (Cursor cursor) {
         return getLong(cursor, COLUMN_ID);
     }
 

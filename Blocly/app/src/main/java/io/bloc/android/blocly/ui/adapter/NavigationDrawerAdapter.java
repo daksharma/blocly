@@ -26,15 +26,16 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     }
 
     public static interface NavigationDrawerAdapterDataSource {
-        public List<RssFeed> getFeeds(NavigationDrawerAdapter adapter);
+        public List<RssFeed> getFeeds (NavigationDrawerAdapter adapter);
     }
 
     public static interface NavigationDrawerAdapterDelegate {
-        public void didSelectNavigationOption(NavigationDrawerAdapter adapter, NavigationOption navigationOption);
-        public void didSelectFeed(NavigationDrawerAdapter adapter, RssFeed rssFeed);
+        public void didSelectNavigationOption (NavigationDrawerAdapter adapter, NavigationOption navigationOption);
+
+        public void didSelectFeed (NavigationDrawerAdapter adapter, RssFeed rssFeed);
     }
 
-    WeakReference<NavigationDrawerAdapterDelegate> delegate;
+    WeakReference<NavigationDrawerAdapterDelegate>   delegate;
     WeakReference<NavigationDrawerAdapterDataSource> dataSource;
 
     @Override
@@ -55,39 +56,39 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
     @Override
     public int getItemCount () {
-        if (getDataSource() == null) {
+        if ( getDataSource() == null ) {
             return NavigationOption.values().length;
         }
         return NavigationOption.values().length + getDataSource().getFeeds(this).size();
     }
 
 
-    public NavigationDrawerAdapterDelegate getDelegate() {
-        if (delegate == null) {
+    public NavigationDrawerAdapterDelegate getDelegate () {
+        if ( delegate == null ) {
             return null;
         }
         return delegate.get();
     }
 
-    public void setDelegate(NavigationDrawerAdapterDelegate delegate) {
+    public void setDelegate (NavigationDrawerAdapterDelegate delegate) {
         this.delegate = new WeakReference<NavigationDrawerAdapterDelegate>(delegate);
     }
 
-    public NavigationDrawerAdapterDataSource getDataSource() {
-        if (dataSource == null) {
+    public NavigationDrawerAdapterDataSource getDataSource () {
+        if ( dataSource == null ) {
             return null;
         }
         return dataSource.get();
     }
 
-    public void setDataSource(NavigationDrawerAdapterDataSource dataSource) {
+    public void setDataSource (NavigationDrawerAdapterDataSource dataSource) {
         this.dataSource = new WeakReference<NavigationDrawerAdapterDataSource>(dataSource);
     }
 
 
     /**
      * CLASS Definition
-     *
+     * <p/>
      * View Holder
      */
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -97,7 +98,7 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         View     bottomPadding;
         View     divider;
 
-        int position;
+        int     position;
         RssFeed rssFeed;
 
         public ViewHolder (View itemView) {
@@ -144,10 +145,10 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
         @Override
         public void onClick (View v) {
-            if (getDelegate() == null) {
+            if ( getDelegate() == null ) {
                 return;
             }
-            if (position < NavigationOption.values().length) {
+            if ( position < NavigationOption.values().length ) {
                 getDelegate().didSelectNavigationOption(NavigationDrawerAdapter.this,
                                                         NavigationOption.values()[position]);
             } else {
