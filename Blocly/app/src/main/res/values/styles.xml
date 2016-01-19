@@ -71,4 +71,18 @@
         <item name="robotoFont">Medium</item>
     </style>
 
+    <style name="RssItemTitle" parent="Base.TextAppearance.AppCompat.Body2">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:singleLine">true</item>
+        <item name="robotoFont">Medium</item>
+    </style>
+
+    <style name="RssItemDetailHeader" parent="Base.TextAppearance.AppCompat.Display1">
+        <item name="android:textColor">@color/black_54</item>
+        <item name="android:maxLines">3</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+
 </resources>
