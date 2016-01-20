@@ -31,7 +31,7 @@ public class BloclyApplication extends Application {
     public void onCreate () {
         super.onCreate();
         sharedInstance = this;
-        dataSource = new DataSource();
+        dataSource = new DataSource(this);
 
         DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder().cacheOnDisk(true)
                                                                               .cacheInMemory(true)

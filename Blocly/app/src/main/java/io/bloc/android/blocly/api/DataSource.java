@@ -1,5 +1,6 @@
 package io.bloc.android.blocly.api;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -43,14 +44,14 @@ public class DataSource {
     private ExecutorService    executorService;
 
 
-    public DataSource () {
+    public DataSource (Context context) {
         rssFeedTable = new RssFeedTable();
         rssItemTable = new RssItemTable();
         executorService = Executors.newSingleThreadExecutor();
 
-        databaseOpenHelper = new DatabaseOpenHelper(BloclyApplication.getSharedInstance(), rssFeedTable, rssItemTable);
+        databaseOpenHelper = new DatabaseOpenHelper(context, rssFeedTable, rssItemTable);
         if ( BuildConfig.DEBUG && true ) {
-            BloclyApplication.getSharedInstance().deleteDatabase("blocly_db");
+            context.deleteDatabase("blocly_db");
             SQLiteDatabase writableDatabase = databaseOpenHelper.getWritableDatabase();
             new RssFeedTable.Builder().setTitle("AndroidCentral")
                                       .setDescription("AndroidCentral - Android News, Tips, and stuff!")
@@ -181,21 +182,21 @@ public class DataSource {
         final Handler callbackThreadHandler = new Handler();
         submitTask(new Runnable() {
             @Override
-            public void run() {
+            public void run () {
                 Cursor cursor = rssItemTable.fetchRow(databaseOpenHelper.getReadableDatabase(), rowId);
-                if (cursor.moveToFirst()) {
+                if ( cursor.moveToFirst() ) {
                     final RssItem rssItem = itemFromCursor(cursor);
                     cursor.close();
                     callbackThreadHandler.post(new Runnable() {
                         @Override
-                        public void run() {
+                        public void run () {
                             callback.onSuccess(rssItem);
                         }
                     });
                 } else {
                     callbackThreadHandler.post(new Runnable() {
                         @Override
-                        public void run() {
+                        public void run () {
                             callback.onError("RSS item not found for row Id (" + rowId + ")");
                         }
                     });

@@ -46,6 +46,7 @@
 
     </RelativeLayout>
 
+    <!-- Phone View -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_nav_activity_blocly"
         android:layout_width="280dp"

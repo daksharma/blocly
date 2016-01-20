@@ -63,8 +63,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
 
     @Override
     public ItemAdapterViewHolder onCreateViewHolder (ViewGroup viewGroup, int index) {
-        View inflate = LayoutInflater.from(viewGroup.getContext())
-                                     .inflate(R.layout.rss_item, viewGroup, false);
+        View inflate = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.rss_item, viewGroup, false);
         return new ItemAdapterViewHolder(inflate);
     }
 
@@ -182,12 +181,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemAdapterVie
                 visitSiteBtn = (Button) expandedContentWrapper.findViewById(R.id.visit_site_btn);
                 visitSiteBtn.setOnClickListener(this);
                 archiveCheckBox.setOnCheckedChangeListener(this);
-                favoriteCheckBox.setOnCheckedChangeListener(this);
+//                favoriteCheckBox.setOnCheckedChangeListener(this);
             } else {
                 // Recover Tablet Views
                 onTablet = true;
                 callout = (TextView) itemView.findViewById(R.id.tv_rss_item_callout);
-                // #3
                 if ( Build.VERSION.SDK_INT >= 21) {
                     callout.setOutlineProvider(new ViewOutlineProvider() {
                         @Override
